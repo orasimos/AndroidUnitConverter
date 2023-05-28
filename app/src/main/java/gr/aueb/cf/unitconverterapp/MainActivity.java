@@ -3,6 +3,9 @@ package gr.aueb.cf.unitconverterapp;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
@@ -11,32 +14,30 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import java.lang.reflect.Array;
 
 public class MainActivity extends AppCompatActivity {
 
-    private EditText inputUnitET;
+    private EditText inputET;
     private Spinner inputSpinner;
     private Spinner settingsSpinner;
     private TextView outputTV;
     private Button convertBtn;
+    private Double inputValue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        inputUnitET = findViewById(R.id.inputUnitET);
+        inputET = findViewById(R.id.inputUnitET);
         inputSpinner = findViewById(R.id.inputSpinner);
         settingsSpinner = findViewById(R.id.settingsSpinner);
         convertBtn = findViewById(R.id.convertBtn);
         outputTV = findViewById(R.id.outputTV);
 
+        inputET.addTextChangedListener(inputTextWatcher);
 
 //      --------- Input Array Adapter ---------
-
         ArrayAdapter<CharSequence> inputAdapter = ArrayAdapter.createFromResource(this, R.array.units_array, android.R.layout.simple_spinner_item);
         inputAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         inputSpinner.setAdapter(inputAdapter);
@@ -53,9 +54,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
 //      --------- Settings Array Adapter ---------
-
         ArrayAdapter<CharSequence> settingsAdapter = ArrayAdapter.createFromResource(this, R.array.units_array, android.R.layout.simple_spinner_item);
         settingsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         settingsSpinner.setAdapter(settingsAdapter);
@@ -72,11 +71,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+//        --------- OnClickListener for convertBtn ---------
         convertBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String resultString;
-                double inputValue = Double.parseDouble(inputUnitET.getText().toString());
+
+                inputValue = Double.parseDouble(inputET.getText().toString().trim());
                 String unitFrom = inputSpinner.getSelectedItem().toString();
                 String unitTo = settingsSpinner.getSelectedItem().toString();
 
@@ -85,161 +86,134 @@ public class MainActivity extends AppCompatActivity {
                 resultString = convertedValue + " " + unitTo;
                 outputTV.setText(resultString);
 
-                inputUnitET.onEditorAction(EditorInfo.IME_ACTION_DONE);
+                inputET.onEditorAction(EditorInfo.IME_ACTION_DONE);
             }
         });
     }
 
+
+    private TextWatcher inputTextWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            String inputETString = inputET.getText().toString().trim();
+
+            convertBtn.setEnabled(!inputETString.isEmpty());
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+
+        }
+    };
+
     /**
      * Private method to convert input to requested units.
-     * @param inputValue The user input value.
-     * @param unitFrom  The units which the input value is in.
-     * @param unitTo    The units to convert to
+     * @param inputValue The user input value. 0.0 if no value is provided.
+     * @param unitFrom  The units which the input value is in. Selected from inputSpinner.
+     * @param unitTo    The units to convert to. Selected from settings Spinner.
      * @return  The result of the conversion. If no unitFrom or unitTo are
      *          selected, returns the input value. (Hopefully...)
      */
-    private double convert(double inputValue, String unitFrom, String unitTo) {
-
-        double result;
+    private double convert(Double inputValue, String unitFrom, String unitTo) {
 
         switch (unitFrom) {
             case "kg":
                 switch (unitTo) {
                     case "gr":
-                        result = inputValue * 1000;
-                        break;
+                        return inputValue * 1000;
                     case "mg":
-                        result = inputValue * 1000000;
-                        break;
+                        return inputValue * 1000000;
                     case "tn":
-                        result = inputValue / 1000;
-                        break;
+                        return inputValue / 1000;
                     case "lb":
-                        result = inputValue * 2.20462;
-                        break;
+                        return inputValue * 2.20462;
                     case "oz":
-                        result = inputValue * 35.274;
-                        break;
+                        return inputValue * 35.274;
                     default:
-                        result = inputValue;
-                        break;
+                        return inputValue;
                 }
-                break;
             case "gr":
                 switch (unitTo) {
                     case "kg":
-                        result = inputValue / 1000;
-                        break;
+                        return inputValue / 1000;
                     case "mg":
-                        result = inputValue * 1000;
-                        break;
+                        return inputValue * 1000;
                     case "tn":
-                        result = inputValue / 1000000;
-                        break;
+                        return inputValue / 1000000;
                     case "lb":
-                        result = inputValue * 0.00220462;
-                        break;
+                        return inputValue * 0.00220462;
                     case "oz":
-                        result = inputValue * 0.035274;
-                        break;
+                        return inputValue * 0.035274;
                     default:
-                        result = inputValue;
-                        break;
+                        return inputValue;
                 }
-                break;
             case "mg":
                 switch (unitTo) {
                     case "kg":
-                        result = inputValue * 1000000;
-                        break;
+                        return inputValue * 1000000;
                     case "gr":
-                        result = inputValue * 1000;
-                        break;
+                        return inputValue * 1000;
                     case "tn":
-                        result = inputValue * 1000000000;
-                        break;
+                        return inputValue * 1000000000;
                     case "lb":
-                        result = inputValue * 2.2046e-6;
-                        break;
+                        return inputValue * 2.2046e-6;
                     case "oz":
-                        result = inputValue * 3.5274e-5;
-                        break;
+                        return inputValue * 3.5274e-5;
                     default:
-                        result = inputValue;
-                        break;
+                        return inputValue;
                 }
-                break;
             case "tn":
                 switch (unitTo) {
                     case "kg":
-                        result = inputValue / 1000;
-                        break;
+                        return inputValue / 1000;
                     case "gr":
-                        result = inputValue / 1000000;
-                        break;
+                        return inputValue / 1000000;
                     case "mg":
-                        result = inputValue / 1000000000;
-                        break;
+                        return inputValue / 1000000000;
                     case "lb":
-                        result = inputValue * 2204.62;
-                        break;
+                        return inputValue * 2204.62;
                     case "oz":
-                        result = inputValue * 35274;
-                        break;
+                        return inputValue * 35274;
                     default:
-                        result = inputValue;
-                        break;
+                        return inputValue;
                 }
-                break;
             case "lb":
                 switch (unitTo) {
                     case "kg":
-                        result = inputValue * 0.453592;
-                        break;
+                        return inputValue * 0.453592;
                     case "gr":
-                        result = inputValue * 453.592;
-                        break;
+                        return inputValue * 453.592;
                     case "mg":
-                        result = inputValue * 453592;
-                        break;
+                        return inputValue * 453592;
                     case "tn":
-                        result = inputValue * 0.000453592;
-                        break;
+                        return inputValue * 0.000453592;
                     case "oz":
-                        result = inputValue * 16;
-                        break;
+                        return inputValue * 16;
                     default:
-                        result = inputValue;
-                        break;
+                        return inputValue;
                 }
-                break;
             case "oz":
                 switch (unitTo) {
                     case "kg":
-                        result = inputValue * 0.0283495;
-                        break;
+                        return inputValue * 0.0283495;
                     case "gr":
-                        result = inputValue * 28.3495;
-                        break;
+                        return inputValue * 28.3495;
                     case "mg":
-                        result = inputValue * 28349.5;
-                        break;
+                        return inputValue * 28349.5;
                     case "tn":
-                        result = inputValue * 2.835e-5;
-                        break;
+                        return inputValue * 2.835e-5;
                     case "lb":
-                        result = inputValue / 16;
-                        break;
+                        return inputValue / 16;
                     default:
-                        result = inputValue;
-                        break;
+                        return inputValue;
                 }
-                break;
             default:
-                result = inputValue;
-                break;
+                return inputValue;
         }
-
-        return result;
     }
 }
