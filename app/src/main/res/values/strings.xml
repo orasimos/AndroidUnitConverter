@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">UnitConverterApp</string>
+    <string name="titleTextView">Unit Converter</string>
+    <string name="inputPrompt">Enter measurement and units:</string>
+    <string name="pounds">lb</string>
+    <string name="convertBtn">Convert</string>
+    <string name="unitToConvertTo">Convert to:</string>
+    <string name="resultHint">Result will show up here</string>
+    <string name="copyToClipboard">Copy to clipboard</string>
+    <string-array name="units_array">
+        <item>kg</item>
+        <item>gr</item>
+        <item>mg</item>
+        <item>tn</item>
+        <item>lb</item>
+        <item>oz</item>
+    </string-array>
+</resources>
